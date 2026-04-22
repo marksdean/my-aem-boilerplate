@@ -1,6 +1,6 @@
 let placeholders;
 
-export async function fetchPlaceholders(prefix = 'default') {
+async function fetchPlaceholders() {
   if (!placeholders) {
     try {
       const resp = await fetch('/placeholders.json');
@@ -15,3 +15,5 @@ export async function fetchPlaceholders(prefix = 'default') {
   }
   return placeholders;
 }
+
+export default fetchPlaceholders;
