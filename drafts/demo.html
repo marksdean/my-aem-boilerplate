@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Block Collection Demo</title>
+</head>
+<body>
+<header></header>
+<main>
+
+  <!-- ============================================================
+       HERO
+       Structure: picture (background) + heading + text
+       ============================================================ -->
+  <div>
+    <div class="hero">
+      <div>
+        <div>
+          <picture>
+            <img src="https://picsum.photos/seed/hero/1400/600" alt="Hero background" loading="eager">
+          </picture>
+          <h1>Block Collection Demo</h1>
+          <p>A showcase of every block available in this AEM Edge Delivery project.</p>
+          <p><a href="#cards">Explore Blocks</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       COLUMNS
+       Structure: single row, each child div = one column
+       ============================================================ -->
+  <div>
+    <h2>Columns</h2>
+    <div class="columns">
+      <div>
+        <div>
+          <h3>Left Column</h3>
+          <p>Use columns to lay out content side by side. This is the left column. It can contain any mix of text, images, or other elements.</p>
+        </div>
+        <div>
+          <h3>Middle Column</h3>
+          <p>The middle column. Authors control how many columns appear by adding more cells to the row in the document.</p>
+        </div>
+        <div>
+          <h3>Right Column</h3>
+          <p>The right column. Columns stack vertically on mobile and display side-by-side on tablet and desktop viewports.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       CARDS
+       Structure: rows of [image div | body div]
+       ============================================================ -->
+  <div id="cards">
+    <h2>Cards</h2>
+    <div class="cards">
+      <div>
+        <div>
+          <picture>
+            <img src="https://picsum.photos/seed/card1/600/400" alt="Mountain landscape">
+          </picture>
+        </div>
+        <div>
+          <h3>Adventure Travel</h3>
+          <p>Explore rugged mountain trails and breathtaking vistas on your next outdoor adventure.</p>
+          <p><a href="#">Read More</a></p>
+        </div>
+      </div>
+      <div>
+        <div>
+          <picture>
+            <img src="https://picsum.photos/seed/card2/600/400" alt="City skyline">
+          </picture>
+        </div>
+        <div>
+          <h3>Urban Exploration</h3>
+          <p>Discover hidden gems and iconic landmarks in cities around the world.</p>
+          <p><a href="#">Read More</a></p>
+        </div>
+      </div>
+      <div>
+        <div>
+          <picture>
+            <img src="https://picsum.photos/seed/card3/600/400" alt="Ocean beach">
+          </picture>
+        </div>
+        <div>
+          <h3>Coastal Escapes</h3>
+          <p>Relax on pristine beaches and explore vibrant coastal communities.</p>
+          <p><a href="#">Read More</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       ACCORDION
+       Structure: rows of [label div | body div]
+       ============================================================ -->
+  <div>
+    <h2>Accordion</h2>
+    <div class="accordion">
+      <div>
+        <div><h3>What is Edge Delivery Services?</h3></div>
+        <div>
+          <p>Edge Delivery Services is a composable set of services that enables a high degree of flexibility in how you author and deliver content on the web. It allows for fast development cycles and fast websites, all measurable through Core Web Vitals.</p>
+        </div>
+      </div>
+      <div>
+        <div><h3>How do blocks work?</h3></div>
+        <div>
+          <p>Blocks are the reusable building blocks of AEM. Each block has a JavaScript file that decorates the initial HTML generated from authored content, and a CSS file that styles it. Blocks are self-contained and automatically loaded only when present on the page.</p>
+        </div>
+      </div>
+      <div>
+        <div><h3>What is the three-phase loading model?</h3></div>
+        <div>
+          <p>Pages load in three phases to maximize performance: <strong>Eager</strong> loads only what is needed for LCP (Largest Contentful Paint), <strong>Lazy</strong> loads the remaining page content including header and footer, and <strong>Delayed</strong> loads non-critical third-party scripts and analytics.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       TABS
+       Structure: rows of [tab-name div | tab-content div]
+       ============================================================ -->
+  <div>
+    <h2>Tabs</h2>
+    <div class="tabs">
+      <div>
+        <div><p>Overview</p></div>
+        <div>
+          <h3>Project Overview</h3>
+          <p>This project is built on the AEM boilerplate, providing a fast, accessible, and easy-to-author website foundation. It uses Edge Delivery Services to serve content at the edge for maximum performance.</p>
+        </div>
+      </div>
+      <div>
+        <div><p>Features</p></div>
+        <div>
+          <h3>Key Features</h3>
+          <ul>
+            <li>Vanilla JavaScript — no framework overhead</li>
+            <li>Automatic image optimization</li>
+            <li>Core Web Vitals targeting 100 score</li>
+            <li>Content authored in Google Docs or SharePoint</li>
+          </ul>
+        </div>
+      </div>
+      <div>
+        <div><p>Getting Started</p></div>
+        <div>
+          <h3>Getting Started</h3>
+          <p>Install dependencies with <code>npm install</code>, then run the dev server with <code>aem up</code>. Your site will be available at <code>http://localhost:3000</code> with live reload.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       CAROUSEL
+       Structure: each row = one slide; can contain image and/or text
+       ============================================================ -->
+  <div>
+    <h2>Carousel</h2>
+    <div class="carousel">
+      <div>
+        <div>
+          <picture>
+            <img src="https://picsum.photos/seed/slide1/1200/500" alt="Slide 1: Forest path">
+          </picture>
+          <h3>Slide One: Into the Forest</h3>
+          <p>A peaceful walk through ancient woodland, where light filters through the canopy above.</p>
+        </div>
+      </div>
+      <div>
+        <div>
+          <picture>
+            <img src="https://picsum.photos/seed/slide2/1200/500" alt="Slide 2: Desert dunes">
+          </picture>
+          <h3>Slide Two: Desert Dunes</h3>
+          <p>Vast rolling dunes stretch to the horizon under a blazing afternoon sun.</p>
+        </div>
+      </div>
+      <div>
+        <div>
+          <picture>
+            <img src="https://picsum.photos/seed/slide3/1200/500" alt="Slide 3: Snowy peaks">
+          </picture>
+          <h3>Slide Three: Snowy Peaks</h3>
+          <p>Snow-capped mountains rise dramatically above the clouds in early morning light.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       QUOTE
+       Structure: row 1 = quotation, row 2 = attribution (use <em> for cite)
+       ============================================================ -->
+  <div>
+    <h2>Quote</h2>
+    <div class="quote">
+      <div>
+        <div>
+          <p>"The web is for everyone. Fast, accessible pages aren't a luxury — they're the baseline."</p>
+        </div>
+      </div>
+      <div>
+        <div>
+          <p><em>AEM Edge Delivery Team</em>, Adobe Experience Manager</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       TABLE
+       Structure: first row = headers; subsequent rows = data
+       ============================================================ -->
+  <div>
+    <h2>Table</h2>
+    <div class="table">
+      <div>
+        <div>Block</div>
+        <div>Purpose</div>
+        <div>Status</div>
+      </div>
+      <div>
+        <div>Hero</div>
+        <div>Full-width banner with background image</div>
+        <div>Included in boilerplate</div>
+      </div>
+      <div>
+        <div>Cards</div>
+        <div>Grid of image + text cards</div>
+        <div>Included in boilerplate</div>
+      </div>
+      <div>
+        <div>Carousel</div>
+        <div>Sliding image/content gallery</div>
+        <div>Block collection</div>
+      </div>
+      <div>
+        <div>Accordion</div>
+        <div>Expandable content sections</div>
+        <div>Block collection</div>
+      </div>
+      <div>
+        <div>Tabs</div>
+        <div>Tabbed content panels</div>
+        <div>Block collection</div>
+      </div>
+      <div>
+        <div>Search</div>
+        <div>Full-text site search</div>
+        <div>Block collection</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       VIDEO
+       Structure: single cell with a link to a YouTube/Vimeo/MP4 URL
+       ============================================================ -->
+  <div>
+    <h2>Video</h2>
+    <div class="video">
+      <div>
+        <div>
+          <a href="https://www.youtube.com/watch?v=RsufHAnkBLs">https://www.youtube.com/watch?v=RsufHAnkBLs</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       EMBED
+       Structure: single cell with a link to YouTube/Vimeo/social URL
+       ============================================================ -->
+  <div>
+    <h2>Embed</h2>
+    <div class="embed">
+      <div>
+        <div>
+          <a href="https://www.youtube.com/watch?v=RsufHAnkBLs">https://www.youtube.com/watch?v=RsufHAnkBLs</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       SEARCH
+       Structure: no initial content required; block handles its own UI
+       ============================================================ -->
+  <div>
+    <h2>Search</h2>
+    <p>The search block renders a search input connected to the page index. Type a query below to search site content.</p>
+    <div class="search">
+      <div>
+        <div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       MODAL (auto-triggered)
+       The modal block auto-transforms any link whose path starts with
+       /modals/ into a modal trigger. The linked page's content is loaded
+       as the modal body. No explicit block declaration needed on the page.
+       ============================================================ -->
+  <div>
+    <h2>Modal</h2>
+    <p>Links that point to a <code>/modals/</code> path are automatically converted into modal triggers by the scripts system. Click the link below to open a modal:</p>
+    <p><a href="/modals/demo">Open Demo Modal</a></p>
+    <p><em>Note: this requires a content page at <code>/modals/demo</code> to be authored and previewed.</em></p>
+  </div>
+
+  <!-- ============================================================
+       FRAGMENT
+       Structure: single cell with a link to the fragment page path
+       Fragments load and render another page's content inline.
+       ============================================================ -->
+  <div>
+    <h2>Fragment</h2>
+    <p>The fragment block embeds the content of another page inline. It requires a previewed content page to reference:</p>
+    <div class="fragment">
+      <div>
+        <div>
+          <a href="/fragments/demo-footer-cta">/fragments/demo-footer-cta</a>
+        </div>
+      </div>
+    </div>
+    <p><em>Note: this requires a content page at <code>/fragments/demo-footer-cta</code> to be authored and previewed.</em></p>
+  </div>
+
+  <!-- ============================================================
+       FORM
+       Structure: a link to a JSON endpoint that defines the form fields.
+       An optional second link provides the form submission endpoint.
+       ============================================================ -->
+  <div>
+    <h2>Form</h2>
+    <p>The form block fetches field definitions from a JSON endpoint and renders a complete accessible form. It requires a <code>.json</code> data source:</p>
+    <div class="form">
+      <div>
+        <div>
+          <a href="/forms/contact.json">/forms/contact.json</a>
+        </div>
+      </div>
+    </div>
+    <p><em>Note: this requires a <code>/forms/contact.json</code> sheet to be authored and previewed with field definitions.</em></p>
+  </div>
+
+</main>
+<footer></footer>
+</body>
+</html>
