@@ -1,0 +1,310 @@
+/* ── Theme tokens (dark default) + layout ──────────────────── */
+.flip-clock {
+  --fc-bg: #111120;
+  --fc-card-top: #2c2c46;
+  --fc-card-bottom: #252540;
+  --fc-digit: #f0f0f0;
+  --fc-sep-dot: #555;
+  --fc-label: #666;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 48px 24px;
+  background: var(--fc-bg);
+}
+
+/* ── Light variant ─────────────────────────────────────────── */
+.flip-clock.light {
+  --fc-bg: #f0f0f2;
+  --fc-card-top: #fff;
+  --fc-card-bottom: #e4e4ec;
+  --fc-digit: #111120;
+  --fc-sep-dot: #bbb;
+  --fc-label: #aaa;
+}
+
+/* ── Layout ────────────────────────────────────────────────── */
+.flip-clock-inner {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.flip-clock-unit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.flip-clock-group {
+  display: flex;
+  gap: 6px;
+}
+
+.flip-clock-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--fc-label);
+  font-family: var(--body-font-family);
+}
+
+.flip-clock-sep {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  padding: 0 10px;
+
+  /* Push dots up to align with card centres, offset for label below */
+  margin-top: 10px;
+  margin-bottom: 30px;
+  align-self: center;
+}
+
+.flip-clock-sep span {
+  display: block;
+  width: 9px;
+  height: 9px;
+  background: var(--fc-sep-dot);
+  border-radius: 50%;
+}
+
+/* ── Card ──────────────────────────────────────────────────── */
+.flip-card {
+  position: relative;
+  width: 84px;
+  height: 104px;
+  perspective: 320px;
+  border-radius: 8px;
+}
+
+.flip-clock.light .flip-card {
+  box-shadow: 0 2px 12px rgb(0 0 0 / 12%);
+}
+
+/*
+ * --fc-unit-color is set inline on each .flip-clock-unit via JS when a
+ * per-unit colour is configured. It inherits to all card halves inside
+ * that unit, falling back to the global --fc-digit token.
+ */
+.flip-card-top,
+.flip-card-bottom,
+.flip-card-fold-top,
+.flip-card-fold-bottom {
+  position: absolute;
+  left: 0;
+  right: 0;
+  overflow: hidden;
+  text-align: center;
+  font-family: var(--heading-font-family);
+  font-weight: 700;
+  font-size: 76px;
+  color: var(--fc-unit-color, var(--fc-digit));
+}
+
+/* Top static half */
+.flip-card-top {
+  top: 0;
+  height: 51px;
+  background: var(--fc-card-top);
+  border-radius: 8px 8px 0 0;
+  border-bottom: 2px solid var(--fc-bg);
+}
+
+.flip-card-top span {
+  display: block;
+  height: 104px;
+  line-height: 104px;
+}
+
+/* Bottom static half */
+.flip-card-bottom {
+  top: 53px;
+  height: 51px;
+  background: var(--fc-card-bottom);
+  border-radius: 0 0 8px 8px;
+}
+
+.flip-card-bottom span {
+  display: block;
+  height: 104px;
+  line-height: 104px;
+  margin-top: -53px;
+}
+
+/* Fold overlays — hidden when not animating */
+.flip-card-fold-top,
+.flip-card-fold-bottom {
+  display: none;
+  z-index: 2;
+}
+
+.flip-card-fold-top {
+  top: 0;
+  height: 51px;
+  background: var(--fc-card-top);
+  border-radius: 8px 8px 0 0;
+  transform-origin: bottom center;
+}
+
+.flip-card-fold-top span {
+  display: block;
+  height: 104px;
+  line-height: 104px;
+}
+
+.flip-card-fold-bottom {
+  top: 53px;
+  height: 51px;
+  background: var(--fc-card-bottom);
+  border-radius: 0 0 8px 8px;
+  transform-origin: top center;
+}
+
+.flip-card-fold-bottom span {
+  display: block;
+  height: 104px;
+  line-height: 104px;
+  margin-top: -53px;
+}
+
+/* Flip animations */
+.flip-card.is-flipping .flip-card-fold-top {
+  display: block;
+  backface-visibility: hidden;
+  animation: flip-clock-top 0.28s cubic-bezier(0.4, 0, 1, 1) forwards;
+}
+
+.flip-card.is-flipping .flip-card-fold-bottom {
+  display: block;
+  backface-visibility: hidden;
+
+  /* 'both' fill mode makes the element start at the from-keyframe even during delay */
+  animation: flip-clock-bottom 0.28s cubic-bezier(0, 0, 0.6, 1) 0.28s both;
+}
+
+@keyframes flip-clock-top {
+  0% { transform: rotateX(0deg); }
+  100% { transform: rotateX(-90deg); }
+}
+
+@keyframes flip-clock-bottom {
+  0% { transform: rotateX(90deg); }
+  100% { transform: rotateX(0deg); }
+}
+
+/* ── Visibility variants ───────────────────────────────────── */
+.flip-clock.no-minutes .flip-clock-minutes,
+.flip-clock.no-minutes .flip-clock-sep-hm {
+  display: none;
+}
+
+.flip-clock.no-seconds .flip-clock-seconds,
+.flip-clock.no-seconds .flip-clock-sep-ms {
+  display: none;
+}
+
+.flip-clock.no-labels .flip-clock-label {
+  display: none;
+}
+
+.flip-clock.no-labels .flip-clock-unit {
+  gap: 0;
+}
+
+.flip-clock.no-labels .flip-clock-sep {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+/* ── Font variants ─────────────────────────────────────────── */
+
+/* Monospace — retro digital / LCD feel */
+.flip-clock.font-mono .flip-card-top,
+.flip-clock.font-mono .flip-card-bottom,
+.flip-clock.font-mono .flip-card-fold-top,
+.flip-clock.font-mono .flip-card-fold-bottom {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 66px;
+}
+
+/* Bold / square — industrial, heavy block style */
+.flip-clock.font-bold .flip-card-top,
+.flip-clock.font-bold .flip-card-bottom,
+.flip-clock.font-bold .flip-card-fold-top,
+.flip-clock.font-bold .flip-card-fold-bottom {
+  font-family: Impact, 'Arial Narrow Bold', 'Arial Black', sans-serif;
+  font-weight: 900;
+  font-size: 82px;
+  letter-spacing: -0.02em;
+}
+
+/* ── Mobile ────────────────────────────────────────────────── */
+@media (width < 600px) {
+  .flip-card {
+    width: 56px;
+    height: 70px;
+    perspective: 220px;
+  }
+
+  .flip-card-top,
+  .flip-card-bottom,
+  .flip-card-fold-top,
+  .flip-card-fold-bottom {
+    font-size: 50px;
+  }
+
+  .flip-card-top,
+  .flip-card-fold-top {
+    height: 34px;
+  }
+
+  .flip-card-top span,
+  .flip-card-fold-top span {
+    height: 70px;
+    line-height: 70px;
+  }
+
+  .flip-card-bottom,
+  .flip-card-fold-bottom {
+    top: 36px;
+    height: 34px;
+  }
+
+  .flip-card-bottom span,
+  .flip-card-fold-bottom span {
+    height: 70px;
+    line-height: 70px;
+    margin-top: -36px;
+  }
+
+  .flip-clock-sep {
+    gap: 12px;
+    padding: 0 6px;
+    margin-bottom: 24px;
+  }
+
+  .flip-clock-sep span {
+    width: 6px;
+    height: 6px;
+  }
+
+  .flip-clock.font-mono .flip-card-top,
+  .flip-clock.font-mono .flip-card-bottom,
+  .flip-clock.font-mono .flip-card-fold-top,
+  .flip-clock.font-mono .flip-card-fold-bottom {
+    font-size: 42px;
+  }
+
+  .flip-clock.font-bold .flip-card-top,
+  .flip-clock.font-bold .flip-card-bottom,
+  .flip-clock.font-bold .flip-card-fold-top,
+  .flip-clock.font-bold .flip-card-fold-bottom {
+    font-size: 56px;
+  }
+}
