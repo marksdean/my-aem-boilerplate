@@ -162,37 +162,46 @@ function createAudioManager() {
   function playDing(count) {
     const ac = getCtx();
     if (!ac || ac.state !== 'running') return;
-    const freq = 523.25; // C5 — pleasant bell fundamental
     const t0 = ac.currentTime + 0.05;
 
     for (let d = 0; d < count; d += 1) {
-      const t = t0 + d * 1.4; // 1.4 s between dings
+      const t = t0 + d * 0.7; // 700 ms between toks
 
-      // Fundamental
-      const osc1 = ac.createOscillator();
-      osc1.type = 'sine';
-      osc1.frequency.value = freq;
-      const g1 = ac.createGain();
-      g1.gain.setValueAtTime(0.001, t);
-      g1.gain.exponentialRampToValueAtTime(0.35, t + 0.004);
-      g1.gain.exponentialRampToValueAtTime(0.001, t + 2.5);
-      osc1.connect(g1);
-      g1.connect(ac.destination);
-      osc1.start(t);
-      osc1.stop(t + 2.6);
+      // Tone: pitch drops 900→650 Hz over 40 ms — the sliding resonance
+      // that makes hollow wood sound different from metal or glass.
+      const osc = ac.createOscillator();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(900, t);
+      osc.frequency.exponentialRampToValueAtTime(650, t + 0.04);
+      const g = ac.createGain();
+      g.gain.setValueAtTime(0.001, t);
+      g.gain.exponentialRampToValueAtTime(0.32, t + 0.002); // sharp attack
+      g.gain.exponentialRampToValueAtTime(0.001, t + 0.09); // fast woody decay
+      osc.connect(g);
+      g.connect(ac.destination);
+      osc.start(t);
+      osc.stop(t + 0.1);
 
-      // Inharmonic partial (2.756× fundamental) — gives bell its character
-      const osc2 = ac.createOscillator();
-      osc2.type = 'sine';
-      osc2.frequency.value = freq * 2.756;
-      const g2 = ac.createGain();
-      g2.gain.setValueAtTime(0.001, t);
-      g2.gain.exponentialRampToValueAtTime(0.12, t + 0.004);
-      g2.gain.exponentialRampToValueAtTime(0.001, t + 1.2);
-      osc2.connect(g2);
-      g2.connect(ac.destination);
-      osc2.start(t);
-      osc2.stop(t + 1.3);
+      // Noise layer: narrow bandpass adds wood grain texture
+      const noiseLen = Math.floor(ac.sampleRate * 0.05);
+      const noiseBuf = ac.createBuffer(1, noiseLen, ac.sampleRate);
+      const noiseData = noiseBuf.getChannelData(0);
+      for (let i = 0; i < noiseLen; i += 1) {
+        const nt = i / noiseLen;
+        noiseData[i] = (Math.random() * 2 - 1) * (1 - nt) * (1 - nt);
+      }
+      const noiseSrc = ac.createBufferSource();
+      noiseSrc.buffer = noiseBuf;
+      const noiseFilter = ac.createBiquadFilter();
+      noiseFilter.type = 'bandpass';
+      noiseFilter.frequency.value = 780;
+      noiseFilter.Q.value = 5; // narrow — keeps the woody character
+      const noiseGain = ac.createGain();
+      noiseGain.gain.setValueAtTime(0.07, t);
+      noiseSrc.connect(noiseFilter);
+      noiseFilter.connect(noiseGain);
+      noiseGain.connect(ac.destination);
+      noiseSrc.start(t);
     }
   }
 
