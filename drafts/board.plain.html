@@ -1,50 +1,50 @@
 <div>
   <h1>Board — Vestaboard Emulator</h1>
 
-  <h2>Default (22 × 6 flagship, centred)</h2>
+  <h2>Default 22 × 6 — long lines truncated at column 22</h2>
   <div class="board">
-    <div><div>Good Morning</div></div>
+    <div><div>This text is longer than 22!</div></div>
+    <div><div>Short line</div></div>
+    <div><div>This also overflows the board!</div></div>
     <div><div></div></div>
-    <div><div>Today is a great day</div></div>
-    <div><div>to build something</div></div>
     <div><div></div></div>
-    <div><div>Let's get to work</div></div>
+    <div><div></div></div>
   </div>
 
-  <h2>Colour tiles (inline {NN} codes)</h2>
+  <h2>Auto — columns expand to fit the longest line</h2>
+  <div class="board auto">
+    <div><div>This text is longer than 22!</div></div>
+    <div><div>Short line</div></div>
+    <div><div>This also overflows the board!</div></div>
+    <div><div></div></div>
+    <div><div></div></div>
+    <div><div></div></div>
+  </div>
+
+  <h2>Fully populated 22 × 6</h2>
   <div class="board">
-    <div><div>{63}{63}{63}{63}{63}{63}{63}{63}{63}{63}{63}{63}{63}{63}{63}{63}{63}{63}{63}{63}{63}{63}</div></div>
-    <div><div>{64}{64}{64}{64}{64}{64}{64}{64}{64}{64}{64}{64}{64}{64}{64}{64}{64}{64}{64}{64}{64}{64}</div></div>
-    <div><div>{65}{65}{65}{65}{65}{65}{65}{65}{65}{65}{65}{65}{65}{65}{65}{65}{65}{65}{65}{65}{65}{65}</div></div>
-    <div><div>{66}{66}{66}{66}{66}{66}{66}{66}{66}{66}{66}{66}{66}{66}{66}{66}{66}{66}{66}{66}{66}{66}</div></div>
-    <div><div>{68}{68}{68}{68}{68}{68}{68}{68}{68}{68}{68}{68}{68}{68}{68}{68}{68}{68}{68}{68}{68}{68}</div></div>
+    <div><div>{63}{64}{65}{66}{67}{68}{69}{70}{63}{64}{65}{66}{67}{68}{69}{70}{63}{64}{65}{66}{67}{68}</div></div>
+    <div><div>{63}{63}{63}{63}Good Morning!{63}{63}{63}{63}{63}</div></div>
+    <div><div>Weather: Sunny 24°C   !</div></div>
+    <div><div>2pm: Team Design Review</div></div>
+    <div><div>{68}{68}{68}{68}Have A Great Day{68}{68}{68}</div></div>
     <div><div>{69}{69}{69}{69}{69}{69}{69}{69}{69}{69}{69}{69}{69}{69}{69}{69}{69}{69}{69}{69}{69}{69}</div></div>
   </div>
 
-  <h2>Mixed text + colour tiles</h2>
-  <div class="board">
-    <div><div>{63}{63}{63} Hello World {63}{63}{63}</div></div>
-    <div><div>{68}{68}{68} Vestaboard {68}{68}{68}</div></div>
-    <div><div>{65}{65} AEM + EDS {65}{65}</div></div>
-    <div><div></div></div>
-    <div><div>No build steps. Pure CSS.</div></div>
-    <div><div>{66}{66}{66}{66}{66}{66}{66}{66}{66}{66}{66}{66}{66}{66}{66}{66}{66}{66}{66}{66}{66}{66}</div></div>
+  <h2>Fully populated auto — daily briefing at full natural width</h2>
+  <div class="board auto">
+    <div><div>{63}{64}{65}{66}{67}{68}{69}{70}{63}{64}{65}{66}{67}{68}{69}{70}{63}{64}{65}{66}{67}{68}{69}{70}{63}{64}{65}{66}{67}{68}</div></div>
+    <div><div>Good morning! Here is your daily briefing.</div></div>
+    <div><div>Date: Thursday, April 24, 2026</div></div>
+    <div><div>Weather: Mostly sunny with highs of 24°C</div></div>
+    <div><div>Meetings: 9am standup + 2pm design review</div></div>
+    <div><div>{69}{69}{69}{69}{69}{69}{69}{69}{69}{69}{69}{69}{69}{69}{69}{69}{69}{69}{69}{69}{69}{69}{69}{69}{69}{69}{69}{69}{69}{69}{69}{69}{69}{69}{69}{69}{69}{69}{69}{69}{69}{69}</div></div>
   </div>
 
-  <h2>Left-aligned</h2>
-  <div class="board left">
-    <div><div>Left aligned text</div></div>
-    <div><div>starts from column 1</div></div>
-    <div><div>no padding added</div></div>
-    <div><div></div></div>
-    <div><div></div></div>
-    <div><div></div></div>
-  </div>
-
-  <h2>Note variant (15 × 3)</h2>
-  <div class="board note">
-    <div><div>Vestaboard</div></div>
-    <div><div>Note Edition</div></div>
-    <div><div>15 x 3</div></div>
+  <h2>Note variant auto (3 × 15+)</h2>
+  <div class="board note auto">
+    <div><div>Good morning! Enjoy your day.</div></div>
+    <div><div>Coffee is ready in the kitchen!</div></div>
+    <div><div>Team lunch today at noon :)</div></div>
   </div>
 </div>

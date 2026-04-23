@@ -17,6 +17,21 @@
     0 0 0 1px #000,
     0 12px 40px rgb(0 0 0 / 80%),
     inset 0 1px 0 rgb(255 255 255 / 4%);
+}
+
+/*
+ * auto: full-bleed break-out so the board spans the full viewport width
+ * and is never clipped by the section's max-width container. Horizontal
+ * scrolling is available when board width exceeds the viewport.
+ */
+.board.auto {
+  width: 100vw;
+  max-width: none;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
   overflow-x: auto;
 }
 

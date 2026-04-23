@@ -82,6 +82,14 @@ function lineToRow(text, cols, align) {
   return [...new Array(left).fill(0), ...trimmed, ...new Array(pad - left).fill(0)];
 }
 
+/**
+ * Count the number of display tiles a text string produces.
+ * Each {NN} code counts as one tile; every other character counts as one.
+ */
+function countTiles(text) {
+  return text.replace(/\{\d+\}/g, 'X').length;
+}
+
 function parseConfig(block) {
   const cfg = {};
   [...block.children].forEach((row) => {
@@ -95,10 +103,9 @@ function parseConfig(block) {
 }
 
 /**
- * Extract authored board rows from block children.
- * Two-cell rows with non-empty values are config; everything else is content.
+ * Extract raw text lines from content rows (skipping two-cell config rows).
  */
-function parseRows(block, rows, cols, align) {
+function getRawLines(block) {
   const lines = [];
   [...block.children].forEach((row) => {
     const cells = [...row.children];
@@ -109,6 +116,11 @@ function parseRows(block, rows, cols, align) {
       lines.push(cells.map((c) => c.textContent.trim()).join(' ').trim());
     }
   });
+  return lines;
+}
+
+function parseRows(rawLines, rows, cols, align) {
+  const lines = [...rawLines];
   while (lines.length < rows) lines.push('');
   return lines.slice(0, rows).map((line) => lineToRow(line, cols, align));
 }
@@ -159,16 +171,26 @@ function animateTile(tile, code) {
 
 export default function decorate(block) {
   const cfg = parseConfig(block);
+  const rawLines = getRawLines(block);
 
   const isNote = block.classList.contains('note');
-  const cols = isNote ? 15 : parseInt(cfg.cols || '22', 10);
+  const isAuto = block.classList.contains('auto');
   const rows = isNote ? 3 : parseInt(cfg.rows || '6', 10);
+
+  let cols;
+  if (isAuto) {
+    // Expand columns to fit the longest content line — never truncate text
+    const maxTiles = rawLines.reduce((m, l) => Math.max(m, countTiles(l)), 0);
+    cols = Math.max(maxTiles, isNote ? 15 : 22);
+  } else {
+    cols = isNote ? 15 : parseInt(cfg.cols || '22', 10);
+  }
 
   let align = 'center';
   if (block.classList.contains('left')) align = 'left';
   else if (block.classList.contains('right')) align = 'right';
 
-  const grid = parseRows(block, rows, cols, align);
+  const grid = parseRows(rawLines, rows, cols, align);
 
   const inner = document.createElement('div');
   inner.className = 'board-inner';
