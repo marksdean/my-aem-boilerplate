@@ -1,0 +1,222 @@
+/* ── Board shell ───────────────────────────────────────────── */
+.board {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 48px 24px;
+  background: #0a0a0a;
+}
+
+.board-inner {
+  display: inline-block;
+  background: #0c0c14;
+  border: 3px solid #1e1e2e;
+  border-radius: 10px;
+  padding: 20px 24px;
+  box-shadow:
+    0 0 0 1px #000,
+    0 12px 40px rgb(0 0 0 / 80%),
+    inset 0 1px 0 rgb(255 255 255 / 4%);
+  overflow-x: auto;
+}
+
+.board-display {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.board-row {
+  display: flex;
+  gap: 3px;
+}
+
+/* ── Tile ──────────────────────────────────────────────────── */
+.board-tile {
+  position: relative;
+  width: 42px;
+  height: 56px;
+  flex-shrink: 0;
+  perspective: 200px;
+  border-radius: 4px;
+}
+
+.board-tile-top,
+.board-tile-bottom,
+.board-tile-fold-top,
+.board-tile-fold-bottom {
+  position: absolute;
+  left: 0;
+  right: 0;
+  overflow: hidden;
+  text-align: center;
+
+  /* Vestaboard uses a chunky condensed character */
+  font-family: Impact, 'Arial Narrow Bold', 'Helvetica Neue', Arial, sans-serif;
+  font-weight: 900;
+  font-size: 36px;
+  letter-spacing: -0.02em;
+  color: #f0e6c8; /* characteristic warm cream */
+}
+
+/* ── Top half ──────────────────────────────────────────────── */
+.board-tile-top,
+.board-tile-fold-top {
+  top: 0;
+  height: 27px;
+  background: var(--tile-color, #1c1c2e);
+  border-radius: 4px 4px 0 0;
+  border-bottom: 1px solid #0c0c14;
+}
+
+.board-tile-top span,
+.board-tile-fold-top span {
+  display: block;
+  height: 56px;
+  line-height: 56px;
+}
+
+/* ── Bottom half ───────────────────────────────────────────── */
+.board-tile-bottom,
+.board-tile-fold-bottom {
+  top: 28px;
+  height: 28px;
+  background: var(--tile-color, #181828);
+  border-radius: 0 0 4px 4px;
+}
+
+.board-tile-bottom span,
+.board-tile-fold-bottom span {
+  display: block;
+  height: 56px;
+  line-height: 56px;
+  margin-top: -28px;
+}
+
+/* ── Colour tiles: hide text, use solid fill ───────────────── */
+.board-tile-color .board-tile-top span,
+.board-tile-color .board-tile-bottom span,
+.board-tile-color .board-tile-fold-top span,
+.board-tile-color .board-tile-fold-bottom span {
+  color: transparent;
+}
+
+/* ── Fold overlays — visible only during flip ──────────────── */
+.board-tile-fold-top,
+.board-tile-fold-bottom {
+  display: none;
+  z-index: 2;
+}
+
+.board-tile-fold-top {
+  transform-origin: bottom center;
+}
+
+.board-tile-fold-bottom {
+  transform-origin: top center;
+}
+
+.board-tile.is-flipping .board-tile-fold-top {
+  display: block;
+  backface-visibility: hidden;
+  animation: board-flip-top 0.28s cubic-bezier(0.4, 0, 1, 1) forwards;
+}
+
+.board-tile.is-flipping .board-tile-fold-bottom {
+  display: block;
+  backface-visibility: hidden;
+
+  /* 'both' holds initial rotateX(90deg) state during the delay */
+  animation: board-flip-bottom 0.28s cubic-bezier(0, 0, 0.6, 1) 0.28s both;
+}
+
+@keyframes board-flip-top {
+  0% { transform: rotateX(0deg); }
+  100% { transform: rotateX(-90deg); }
+}
+
+@keyframes board-flip-bottom {
+  0% { transform: rotateX(90deg); }
+  100% { transform: rotateX(0deg); }
+}
+
+/* ── Note variant (3 × 15) ─────────────────────────────────── */
+.board.note .board-tile {
+  width: 44px;
+  height: 58px;
+}
+
+.board.note .board-tile-top,
+.board.note .board-tile-fold-top {
+  height: 28px;
+}
+
+.board.note .board-tile-top span,
+.board.note .board-tile-fold-top span {
+  height: 58px;
+  line-height: 58px;
+}
+
+.board.note .board-tile-bottom,
+.board.note .board-tile-fold-bottom {
+  top: 29px;
+  height: 29px;
+}
+
+.board.note .board-tile-bottom span,
+.board.note .board-tile-fold-bottom span {
+  height: 58px;
+  line-height: 58px;
+  margin-top: -29px;
+}
+
+/* ── Mobile ────────────────────────────────────────────────── */
+@media (width < 900px) {
+  .board-inner {
+    padding: 14px 16px;
+  }
+
+  .board-tile {
+    width: 28px;
+    height: 38px;
+  }
+
+  .board-tile-top,
+  .board-tile-bottom,
+  .board-tile-fold-top,
+  .board-tile-fold-bottom {
+    font-size: 24px;
+  }
+
+  .board-tile-top,
+  .board-tile-fold-top {
+    height: 18px;
+  }
+
+  .board-tile-top span,
+  .board-tile-fold-top span {
+    height: 38px;
+    line-height: 38px;
+  }
+
+  .board-tile-bottom,
+  .board-tile-fold-bottom {
+    top: 19px;
+    height: 19px;
+  }
+
+  .board-tile-bottom span,
+  .board-tile-fold-bottom span {
+    height: 38px;
+    line-height: 38px;
+    margin-top: -19px;
+  }
+
+  .board-display {
+    gap: 2px;
+  }
+
+  .board-row {
+    gap: 2px;
+  }
+}
