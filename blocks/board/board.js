@@ -211,6 +211,17 @@ export default function decorate(block) {
     display.append(rowEl);
   });
 
+  // Apply colour tokens from config rows
+  if (cfg.background) block.style.setProperty('--board-bg', cfg.background);
+  if (cfg.housing) block.style.setProperty('--board-housing', cfg.housing);
+  if (cfg.color) block.style.setProperty('--board-char-override', cfg.color);
+  if (cfg.tile) {
+    block.style.setProperty('--board-tile-top', cfg.tile);
+    block.style.setProperty('--board-tile-bottom', cfg.tile);
+  }
+  if (cfg['tile-top']) block.style.setProperty('--board-tile-top', cfg['tile-top']);
+  if (cfg['tile-bottom']) block.style.setProperty('--board-tile-bottom', cfg['tile-bottom']);
+
   inner.append(display);
   block.replaceChildren(inner);
 
