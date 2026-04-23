@@ -85,10 +85,102 @@ function pad(n) {
   return String(n).padStart(2, '0');
 }
 
-function tick(cards) {
+/**
+ * Creates a Web Audio click-sound synthesiser that emulates the mechanical
+ * snap of a physical split-flap card. Returns a play() function.
+ *
+ * The AudioContext is created lazily on the first play() call and is
+ * resumed automatically on the next user gesture (browsers block audio
+ * until interaction — sounds will begin working after the first click/tap).
+ */
+function createSoundPlayer() {
+  let ctx = null;
+
+  function ensureContext() {
+    if (ctx) return;
+    try {
+      ctx = new AudioContext();
+    } catch (e) {
+      return;
+    }
+    // Resume on first user gesture so sounds start as soon as the user
+    // interacts with the page (satisfies browser autoplay policy).
+    const resume = () => { if (ctx.state === 'suspended') ctx.resume(); };
+    document.addEventListener('click', resume, { once: true });
+    document.addEventListener('keydown', resume, { once: true });
+    document.addEventListener('touchstart', resume, { once: true });
+  }
+
+  return function play() {
+    ensureContext();
+    if (!ctx || ctx.state !== 'running') return;
+
+    const { currentTime: now, sampleRate } = ctx;
+
+    // --- Tick: high-frequency transient (the latch releasing) ---
+    const tickLen = Math.floor(sampleRate * 0.02);
+    const tickBuf = ctx.createBuffer(1, tickLen, sampleRate);
+    const tickData = tickBuf.getChannelData(0);
+    for (let i = 0; i < tickLen; i += 1) {
+      const t = i / tickLen;
+      tickData[i] = (Math.random() * 2 - 1) * (1 - t) * (1 - t);
+    }
+
+    const tickSrc = ctx.createBufferSource();
+    tickSrc.buffer = tickBuf;
+
+    const tickFilter = ctx.createBiquadFilter();
+    tickFilter.type = 'bandpass';
+    tickFilter.frequency.value = 3200;
+    tickFilter.Q.value = 2.5;
+
+    const tickGain = ctx.createGain();
+    tickGain.gain.setValueAtTime(0.18, now);
+
+    // --- Clack: lower-frequency thud (the card landing) ---
+    const clackLen = Math.floor(sampleRate * 0.05);
+    const clackBuf = ctx.createBuffer(1, clackLen, sampleRate);
+    const clackData = clackBuf.getChannelData(0);
+    for (let i = 0; i < clackLen; i += 1) {
+      const t = i / clackLen;
+      clackData[i] = (Math.random() * 2 - 1) * (1 - t) * (1 - t) * (1 - t);
+    }
+
+    const clackSrc = ctx.createBufferSource();
+    clackSrc.buffer = clackBuf;
+
+    const clackFilter = ctx.createBiquadFilter();
+    clackFilter.type = 'bandpass';
+    clackFilter.frequency.value = 700;
+    clackFilter.Q.value = 1.2;
+
+    const clackGain = ctx.createGain();
+    clackGain.gain.setValueAtTime(0, now);
+    clackGain.gain.setValueAtTime(0.12, now + 0.008); // 8 ms after tick
+
+    // Wire up and play
+    tickSrc.connect(tickFilter);
+    tickFilter.connect(tickGain);
+    tickGain.connect(ctx.destination);
+
+    clackSrc.connect(clackFilter);
+    clackFilter.connect(clackGain);
+    clackGain.connect(ctx.destination);
+
+    tickSrc.start(now);
+    clackSrc.start(now);
+  };
+}
+
+function tick(cards, playClick) {
   const now = new Date();
   const digits = `${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
-  cards.forEach((card, i) => animateDigit(card, digits[i]));
+  cards.forEach((card, i) => {
+    const changed = card.dataset.value !== digits[i];
+    animateDigit(card, digits[i]);
+    // Stagger clicks by card index (8 ms apart) for a natural cascade effect
+    if (changed && playClick) setTimeout(playClick, i * 8);
+  });
 }
 
 export default function decorate(block) {
@@ -144,10 +236,13 @@ export default function decorate(block) {
     card.querySelectorAll('span').forEach((span) => { span.textContent = v; });
   });
 
+  // Optional click sound — enabled with the 'sound' variant class
+  const playClick = block.classList.contains('sound') ? createSoundPlayer() : null;
+
   // Sync interval to the start of the next second
   const msToNextSecond = 1000 - now.getMilliseconds();
   setTimeout(() => {
-    tick(cards);
-    setInterval(() => tick(cards), 1000);
+    tick(cards, playClick);
+    setInterval(() => tick(cards, playClick), 1000);
   }, msToNextSecond);
 }
