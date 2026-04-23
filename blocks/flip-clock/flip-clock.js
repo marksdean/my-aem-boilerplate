@@ -231,13 +231,13 @@ function tick(cards, audio) {
   cards.forEach((card, i) => {
     const changed = card.dataset.value !== digits[i];
     animateDigit(card, digits[i]);
-    if (changed && audio.click && audio.soundUnits.has(i)) {
+    if (changed && !audio.muted && audio.click && audio.soundUnits.has(i)) {
       setTimeout(audio.click, i * 8); // stagger 8 ms per card
     }
   });
 
   // Ding on the hour (fires once when m and s both become 0)
-  if (m === 0 && s === 0 && audio.ding) {
+  if (m === 0 && s === 0 && !audio.muted && audio.ding) {
     const count = audio.dingCount ? (h % 12 || 12) : 1;
     setTimeout(() => audio.ding(count), 200);
   }
@@ -305,6 +305,7 @@ export default function decorate(block) {
     soundUnits: new Set(),
     ding: null,
     dingCount: false,
+    muted: false,
   };
 
   if (soundEnabled || dingEnabled) {
@@ -318,6 +319,13 @@ export default function decorate(block) {
       // | ding | count | → dings equal to the hour number (1–12)
       audio.dingCount = (cfg.ding || '').toLowerCase() === 'count';
     }
+
+    // Click anywhere on the clock to toggle mute
+    block.classList.add('has-sound');
+    block.addEventListener('click', () => {
+      audio.muted = !audio.muted;
+      block.classList.toggle('is-muted', audio.muted);
+    });
   }
 
   // Sync interval to the start of the next second
