@@ -86,101 +86,161 @@ function pad(n) {
 }
 
 /**
- * Creates a Web Audio click-sound synthesiser that emulates the mechanical
- * snap of a physical split-flap card. Returns a play() function.
+ * Single shared AudioContext for all sounds on this clock.
+ * Lazily created; resumes automatically on the first user gesture
+ * (browsers block audio until interaction).
  *
- * The AudioContext is created lazily on the first play() call and is
- * resumed automatically on the next user gesture (browsers block audio
- * until interaction — sounds will begin working after the first click/tap).
+ * Returns { playClick, playDing }.
  */
-function createSoundPlayer() {
+function createAudioManager() {
   let ctx = null;
 
-  function ensureContext() {
-    if (ctx) return;
-    try {
-      ctx = new AudioContext();
-    } catch (e) {
-      return;
+  function getCtx() {
+    if (!ctx) {
+      try {
+        ctx = new AudioContext();
+      } catch (e) {
+        return null;
+      }
+      const resume = () => { if (ctx.state === 'suspended') ctx.resume(); };
+      document.addEventListener('click', resume, { once: true });
+      document.addEventListener('keydown', resume, { once: true });
+      document.addEventListener('touchstart', resume, { once: true });
     }
-    // Resume on first user gesture so sounds start as soon as the user
-    // interacts with the page (satisfies browser autoplay policy).
-    const resume = () => { if (ctx.state === 'suspended') ctx.resume(); };
-    document.addEventListener('click', resume, { once: true });
-    document.addEventListener('keydown', resume, { once: true });
-    document.addEventListener('touchstart', resume, { once: true });
+    return ctx;
   }
 
-  return function play() {
-    ensureContext();
-    if (!ctx || ctx.state !== 'running') return;
+  function playClick() {
+    const ac = getCtx();
+    if (!ac || ac.state !== 'running') return;
+    const { currentTime: now, sampleRate } = ac;
 
-    const { currentTime: now, sampleRate } = ctx;
-
-    // --- Tick: high-frequency transient (the latch releasing) ---
+    // Tick — high-frequency transient (latch releasing)
     const tickLen = Math.floor(sampleRate * 0.02);
-    const tickBuf = ctx.createBuffer(1, tickLen, sampleRate);
+    const tickBuf = ac.createBuffer(1, tickLen, sampleRate);
     const tickData = tickBuf.getChannelData(0);
     for (let i = 0; i < tickLen; i += 1) {
       const t = i / tickLen;
       tickData[i] = (Math.random() * 2 - 1) * (1 - t) * (1 - t);
     }
-
-    const tickSrc = ctx.createBufferSource();
+    const tickSrc = ac.createBufferSource();
     tickSrc.buffer = tickBuf;
-
-    const tickFilter = ctx.createBiquadFilter();
+    const tickFilter = ac.createBiquadFilter();
     tickFilter.type = 'bandpass';
     tickFilter.frequency.value = 3200;
     tickFilter.Q.value = 2.5;
-
-    const tickGain = ctx.createGain();
+    const tickGain = ac.createGain();
     tickGain.gain.setValueAtTime(0.18, now);
+    tickSrc.connect(tickFilter);
+    tickFilter.connect(tickGain);
+    tickGain.connect(ac.destination);
+    tickSrc.start(now);
 
-    // --- Clack: lower-frequency thud (the card landing) ---
+    // Clack — lower-frequency thud (card landing, 8 ms delayed)
     const clackLen = Math.floor(sampleRate * 0.05);
-    const clackBuf = ctx.createBuffer(1, clackLen, sampleRate);
+    const clackBuf = ac.createBuffer(1, clackLen, sampleRate);
     const clackData = clackBuf.getChannelData(0);
     for (let i = 0; i < clackLen; i += 1) {
       const t = i / clackLen;
       clackData[i] = (Math.random() * 2 - 1) * (1 - t) * (1 - t) * (1 - t);
     }
-
-    const clackSrc = ctx.createBufferSource();
+    const clackSrc = ac.createBufferSource();
     clackSrc.buffer = clackBuf;
-
-    const clackFilter = ctx.createBiquadFilter();
+    const clackFilter = ac.createBiquadFilter();
     clackFilter.type = 'bandpass';
     clackFilter.frequency.value = 700;
     clackFilter.Q.value = 1.2;
-
-    const clackGain = ctx.createGain();
+    const clackGain = ac.createGain();
     clackGain.gain.setValueAtTime(0, now);
-    clackGain.gain.setValueAtTime(0.12, now + 0.008); // 8 ms after tick
-
-    // Wire up and play
-    tickSrc.connect(tickFilter);
-    tickFilter.connect(tickGain);
-    tickGain.connect(ctx.destination);
-
+    clackGain.gain.setValueAtTime(0.12, now + 0.008);
     clackSrc.connect(clackFilter);
     clackFilter.connect(clackGain);
-    clackGain.connect(ctx.destination);
-
-    tickSrc.start(now);
+    clackGain.connect(ac.destination);
     clackSrc.start(now);
-  };
+  }
+
+  function playDing(count) {
+    const ac = getCtx();
+    if (!ac || ac.state !== 'running') return;
+    const freq = 523.25; // C5 — pleasant bell fundamental
+    const t0 = ac.currentTime + 0.05;
+
+    for (let d = 0; d < count; d += 1) {
+      const t = t0 + d * 1.4; // 1.4 s between dings
+
+      // Fundamental
+      const osc1 = ac.createOscillator();
+      osc1.type = 'sine';
+      osc1.frequency.value = freq;
+      const g1 = ac.createGain();
+      g1.gain.setValueAtTime(0.001, t);
+      g1.gain.exponentialRampToValueAtTime(0.35, t + 0.004);
+      g1.gain.exponentialRampToValueAtTime(0.001, t + 2.5);
+      osc1.connect(g1);
+      g1.connect(ac.destination);
+      osc1.start(t);
+      osc1.stop(t + 2.6);
+
+      // Inharmonic partial (2.756× fundamental) — gives bell its character
+      const osc2 = ac.createOscillator();
+      osc2.type = 'sine';
+      osc2.frequency.value = freq * 2.756;
+      const g2 = ac.createGain();
+      g2.gain.setValueAtTime(0.001, t);
+      g2.gain.exponentialRampToValueAtTime(0.12, t + 0.004);
+      g2.gain.exponentialRampToValueAtTime(0.001, t + 1.2);
+      osc2.connect(g2);
+      g2.connect(ac.destination);
+      osc2.start(t);
+      osc2.stop(t + 1.3);
+    }
+  }
+
+  return { playClick, playDing };
 }
 
-function tick(cards, playClick) {
+/**
+ * Determine which card indices (0-5: h0,h1,m0,m1,s0,s1) should trigger
+ * the click sound.  Controlled by the `sound` config row value:
+ *   minutes (default) | hours | seconds | all | hours,seconds  etc.
+ */
+function getSoundUnits(cfg) {
+  const val = (cfg.sound || 'minutes').toLowerCase();
+  if (val === 'all') return new Set([0, 1, 2, 3, 4, 5]);
+  const units = new Set();
+  if (val.includes('hours')) { units.add(0); units.add(1); }
+  if (val.includes('minutes')) { units.add(2); units.add(3); }
+  if (val.includes('seconds')) { units.add(4); units.add(5); }
+  return units.size > 0 ? units : new Set([2, 3]); // default: minutes
+}
+
+/**
+ * audio = { click, soundUnits, ding, dingCount }
+ *   click      — playClick fn or null
+ *   soundUnits — Set of card indices that trigger the click
+ *   ding       — playDing fn or null
+ *   dingCount  — true → ding × (hour % 12), false → single ding
+ */
+function tick(cards, audio) {
   const now = new Date();
-  const digits = `${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
+  const h = now.getHours();
+  const m = now.getMinutes();
+  const s = now.getSeconds();
+  const digits = `${pad(h)}${pad(m)}${pad(s)}`;
+
   cards.forEach((card, i) => {
     const changed = card.dataset.value !== digits[i];
     animateDigit(card, digits[i]);
-    // Stagger clicks by card index (8 ms apart) for a natural cascade effect
-    if (changed && playClick) setTimeout(playClick, i * 8);
+    if (changed && audio.click && audio.soundUnits.has(i)) {
+      setTimeout(audio.click, i * 8); // stagger 8 ms per card
+    }
   });
+
+  // Ding on the hour (fires once when m and s both become 0)
+  if (m === 0 && s === 0 && audio.ding) {
+    const count = audio.dingCount ? (h % 12 || 12) : 1;
+    setTimeout(() => audio.ding(count), 200);
+  }
 }
 
 export default function decorate(block) {
@@ -236,13 +296,34 @@ export default function decorate(block) {
     card.querySelectorAll('span').forEach((span) => { span.textContent = v; });
   });
 
-  // Optional click sound — enabled with the 'sound' variant class
-  const playClick = block.classList.contains('sound') ? createSoundPlayer() : null;
+  // ── Sound setup ──────────────────────────────────────────────
+  const soundEnabled = block.classList.contains('sound') || !!cfg.sound;
+  const dingEnabled = block.classList.contains('ding') || !!cfg.ding;
+
+  const audio = {
+    click: null,
+    soundUnits: new Set(),
+    ding: null,
+    dingCount: false,
+  };
+
+  if (soundEnabled || dingEnabled) {
+    const manager = createAudioManager();
+    if (soundEnabled) {
+      audio.click = manager.playClick;
+      audio.soundUnits = getSoundUnits(cfg);
+    }
+    if (dingEnabled) {
+      audio.ding = manager.playDing;
+      // | ding | count | → dings equal to the hour number (1–12)
+      audio.dingCount = (cfg.ding || '').toLowerCase() === 'count';
+    }
+  }
 
   // Sync interval to the start of the next second
   const msToNextSecond = 1000 - now.getMilliseconds();
   setTimeout(() => {
-    tick(cards, playClick);
-    setInterval(() => tick(cards, playClick), 1000);
+    tick(cards, audio);
+    setInterval(() => tick(cards, audio), 1000);
   }, msToNextSecond);
 }
