@@ -30,6 +30,48 @@ CODE_CHARS.forEach((ch, code) => {
   if (ch.trim() && !CHAR_TO_CODE[ch]) CHAR_TO_CODE[ch] = code;
 });
 
+// Emoji → colour tile code. Variation selector (️) is stripped before
+// lookup so ❤️ and ❤ both resolve to 63.
+const EMOJI_CODES = {
+  '🟥': 63,
+  '🟧': 64,
+  '🟨': 65,
+  '🟩': 66,
+  '🟦': 68,
+  '🟪': 69,
+  '⬜': 70,
+  '⬛': 0,
+  '🔲': 70,
+  '🔳': 0,
+  '❤': 63,
+  '🧡': 64,
+  '💛': 65,
+  '💚': 66,
+  '💙': 68,
+  '💜': 69,
+  '🤍': 70,
+  '🖤': 0,
+  '🔴': 63,
+  '🟠': 64,
+  '🟡': 65,
+  '🟢': 66,
+  '🔵': 68,
+  '🟣': 69,
+  '⚪': 70,
+  '⚫': 0,
+};
+
+/**
+ * Replace emoji with {NN} codes so the existing {NN} parser handles them.
+ * Array.from splits on Unicode code points (handles multi-byte emoji).
+ */
+function resolveEmojis(text) {
+  return Array.from(text.replace(/️/g, '')).reduce((out, ch) => {
+    const code = EMOJI_CODES[ch];
+    return out + (code !== undefined ? `{${code}}` : ch);
+  }, '');
+}
+
 function charToCode(ch) {
   return CHAR_TO_CODE[ch.toUpperCase()] ?? 0;
 }
@@ -43,17 +85,18 @@ function trimBlanks(codes) {
 }
 
 /**
- * Convert a text line (may contain {NN} inline colour codes) to an array of
- * Vestaboard character codes, padded/truncated to `cols`.
+ * Convert a text line (may contain emoji, {NN} colour codes, or plain text)
+ * to an array of Vestaboard character codes, padded/truncated to `cols`.
  */
 function lineToRow(text, cols, align) {
   const raw = [];
+  const resolved = resolveEmojis(text);
   let i = 0;
-  while (i < text.length) {
-    if (text[i] === '{') {
-      const end = text.indexOf('}', i + 1);
+  while (i < resolved.length) {
+    if (resolved[i] === '{') {
+      const end = resolved.indexOf('}', i + 1);
       if (end !== -1) {
-        const n = parseInt(text.slice(i + 1, end), 10);
+        const n = parseInt(resolved.slice(i + 1, end), 10);
         if (!Number.isNaN(n) && n >= 0 && n <= 71) {
           raw.push(n);
           i = end + 1;
@@ -62,7 +105,7 @@ function lineToRow(text, cols, align) {
         }
       }
     }
-    raw.push(charToCode(text[i]));
+    raw.push(charToCode(resolved[i]));
     i += 1;
   }
 
@@ -84,10 +127,10 @@ function lineToRow(text, cols, align) {
 
 /**
  * Count the number of display tiles a text string produces.
- * Each {NN} code counts as one tile; every other character counts as one.
+ * Emoji are resolved first so each emoji counts as exactly one tile.
  */
 function countTiles(text) {
-  return text.replace(/\{\d+\}/g, 'X').length;
+  return resolveEmojis(text).replace(/\{\d+\}/g, 'X').length;
 }
 
 function parseConfig(block) {

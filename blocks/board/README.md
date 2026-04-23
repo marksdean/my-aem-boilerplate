@@ -46,20 +46,26 @@ Add two-column rows anywhere in the block to set colours and dimensions. These r
 | `rows` | `4` | Override row count (default 6, or 3 for `note`) |
 | `cols` | `30` | Override column count (ignored when `auto` is set) |
 
-## Inline Colour Tile Codes
+## Inline Colour Tiles
 
-Embed `{NN}` codes anywhere in a content row to insert a solid-colour tile at that position. These can be mixed freely with text characters.
+Insert solid-colour tiles using either **emoji** (recommended for authoring) or **`{NN}` numeric codes**. Both can be mixed freely with text characters anywhere in a content row.
 
-| Code | Colour |
-|---|---|
-| `{63}` | Red |
-| `{64}` | Orange |
-| `{65}` | Yellow |
-| `{66}` | Green |
-| `{67}` | Cyan |
-| `{68}` | Blue |
-| `{69}` | Violet |
-| `{70}` | White (cream) |
+| Emoji | Code | Colour |
+|---|---|---|
+| 🟥 | `{63}` | Red |
+| 🟧 | `{64}` | Orange |
+| 🟨 | `{65}` | Yellow |
+| 🟩 | `{66}` | Green |
+| 🟦 | `{68}` | Blue |
+| 🟪 | `{69}` | Violet |
+| ⬜ | `{70}` | White (cream) |
+| ⬛ | `{0}` | Black (blank) |
+
+Heart and circle emojis also work: ❤️ = 🟥, 🧡 = 🟧, 💛 = 🟨, 💚 = 🟩, 💙 = 🟦, 💜 = 🟪, 🤍 = ⬜, 🖤 = ⬛. And 🔴🟠🟡🟢🔵🟣⚪⚫ follow the same mapping.
+
+**Cyan (`{67}`) has no emoji equivalent** — use `{67}` directly.
+
+Emoji variation selectors (the invisible `️` character appended to some emoji) are stripped automatically.
 
 ## Character Encoding
 
@@ -170,7 +176,20 @@ Unknown characters (emoji, accented letters, etc.) are rendered as blank tiles.
 
 ---
 
-### Rainbow colour tile rows + text
+### Emoji colour tiles (much easier to author than `{NN}` codes)
+
+| Board |
+|---|
+| 🟥🟧🟨🟩🟦🟪⬜🟥🟧🟨🟩🟦🟪⬜🟥🟧🟨🟩🟦🟪⬜🟥 |
+| ❤️❤️❤️ Good Morning! ❤️❤️❤️ |
+| 💛💛 AEM Edge Delivery 💛💛 |
+| 💚💚 Build something great 💚💚 |
+| 💙💙💙 today! 💙💙💙 |
+| 🟥🟧🟨🟩🟦🟪⬜🟥🟧🟨🟩🟦🟪⬜🟥🟧🟨🟩🟦🟪⬜🟥 |
+
+---
+
+### `{NN}` colour tile codes (equivalent to the emoji above)
 
 | Board |
 |---|
